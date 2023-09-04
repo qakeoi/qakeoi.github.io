@@ -1,28 +1,54 @@
-window.onload = function() {
-    document.getElementById("contact-form").addEventListener("submit", function(event){
-      event.preventDefault(); // Prevent form submission
-      sendEmail(); // Call function to send email
-    });
-  }
-  
-  function sendEmail() {
-    var name = document.getElementById("name").value;
-    var email = document.getElementById("email").value;
-    var message = document.getElementById("message").value;
-    
-    // Send the form data to send-email.php using AJAX request
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "send-email.php", true);
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        // Display success message or handle any errors
-        if (xhr.responseText) {
-          alert(xhr.responseText);
-        } else {
-          alert("Email sent successfully!");
-        }
+// This code validates the input data and sends an email when the form is submitted.
+$(document).ready(function() {
+  $('#submit').click(function() {
+    var name = $('#name').val();
+    var email = $('#email').val();
+    var subject = $('#subject').val();
+    var message = $('#message').val();
+
+    if (name == '') {
+      alert('Please enter your name.');
+      return false;
+    }
+
+    if (email == '') {
+      alert('Please enter your email address.');
+      return false;
+    }
+
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email address.');
+      return false;
+    }
+
+    if (subject == '') {
+      alert('Please enter a subject.');
+      return false;
+    }
+
+    if (message == '') {
+      alert('Please enter your message.');
+      return false;
+    }
+
+    // Send the email
+    var ajax = new XMLHttpRequest();
+    ajax.open('POST', 'mail.php');
+    ajax.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    ajax.send('name=' + name + '&email=' + email + '&subject=' + subject + '&message=' + message);
+
+    ajax.onload = function() {
+      if (ajax.status == 200) {
+        alert('Your message has been sent.');
+      } else {
+        alert('An error occurred.');
       }
     };
-    xhr.send("name=" + name + "&email=" + email + "&message=" + message);
-  }
+  });
+});
+
+// This function validates the email address.
+function validateEmail(email) {
+  var regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return regex.test(email);
+}
